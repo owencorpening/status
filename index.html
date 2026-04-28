@@ -359,8 +359,40 @@
 
   .add-btn:hover { background: var(--teal-mid); color: var(--white); }
 
-  .section-label {
-    padding: 0 32px 8px;
+  .card-article {
+    border-left: 3px solid var(--teal-mid);
+  }
+
+  /* FILTER TABS */
+  .filter-bar {
+    padding: 0 32px 16px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #30363d;
+    background: transparent;
+    color: #8b949e;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .filter-btn.active {
+    background: var(--teal-deep);
+    border-color: var(--teal-mid);
+    color: var(--teal-light);
+  }
+
+  .filter-btn:hover:not(.active) {
+    border-color: var(--teal-mid);
+    color: var(--white);
+  }
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     color: var(--teal-light);
@@ -418,7 +450,15 @@
   </div>
 </div>
 
-<div class="section-label">Add Repo</div>
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('repo', this)">⚙️ Repos</button>
+  <button class="filter-btn" onclick="setFilter('article', this)">📄 Articles</button>
+  <button class="filter-btn" onclick="setFilter('blocked', this)">🔴 Blocked</button>
+  <button class="filter-btn" onclick="setFilter('ready', this)">🟡 Ready</button>
+</div>
+
+<div class="section-label">Add Repo / Article</div>
 <div class="add-repo-bar">
   <input type="text" id="newRepo" placeholder="owencorpening/repo-name" 
          onkeydown="if(event.key==='Enter') addRepo()" />
@@ -440,10 +480,41 @@ const DEFAULT_REPOS = [
   'reaper-react-bridge',
   'Reaper_InsertLyrics',
   'image-capture',
+  'globe-with-time-knob',
+  'songster',
 ];
 
 let repos = [];
 let cards = {};
+
+let cardData = {};
+let currentFilter = 'all';
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  document.querySelectorAll('#grid > div').forEach(el => {
+    const id = el.id.replace('card-', '');
+    const repo = repos.find(r => 'card-' + r.replace(/[^a-z0-9]/gi, '-') === el.id);
+    const data = cardData[repo];
+    if (!data || currentFilter === 'all') {
+      el.style.display = '';
+      return;
+    }
+    const type = data.type || 'repo';
+    const state = data.state || 'unknown';
+    if (currentFilter === 'repo')     el.style.display = type !== 'article' ? '' : 'none';
+    else if (currentFilter === 'article') el.style.display = type === 'article' ? '' : 'none';
+    else if (currentFilter === 'blocked') el.style.display = state === 'blocked' ? '' : 'none';
+    else if (currentFilter === 'ready')   el.style.display = state === 'ready' ? '' : 'none';
+    else el.style.display = '';
+  });
+}
 
 function saveToken() {
   const t = document.getElementById('ghToken').value.trim();
@@ -489,24 +560,31 @@ function getHeaders() {
 }
 
 function parseStatus(content) {
-  // Look for ## Status block
   const statusMatch = content.match(/##\s+Status\s*\n([\s\S]*?)(?=\n##|\n---|\Z|$)/i);
-  if (!statusMatch) return { state: 'unknown', next: 'No status block found in CLAUDE.md', updated: null };
+  if (!statusMatch) return { state: 'unknown', next: 'No status block found in CLAUDE.md', updated: null, type: 'repo' };
 
   const block = statusMatch[1];
 
-  const stateMatch = block.match(/[-*]\s+\*\*State[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const nextMatch  = block.match(/[-*]\s+\*\*Next action[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const updatedMatch = block.match(/[-*]\s+\*\*Last updated[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const stateMatch     = block.match(/[-*]\s+\*\*State[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const nextMatch      = block.match(/[-*]\s+\*\*Next action[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const updatedMatch   = block.match(/[-*]\s+\*\*Last updated[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const typeMatch      = block.match(/[-*]\s+\*\*Type[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const seriesMatch    = block.match(/[-*]\s+\*\*Series[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const publishedMatch = block.match(/[-*]\s+\*\*Published[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const platformMatch  = block.match(/[-*]\s+\*\*Platform[:\*]*\*?\*?\s*:?\s*(.+)/i);
 
   const rawState = stateMatch ? stateMatch[1].trim() : 'unknown';
   const state = normalizeState(rawState);
+  const type = typeMatch ? typeMatch[1].trim().toLowerCase() : 'repo';
 
   return {
-    state,
-    rawState,
+    state, rawState,
     next: nextMatch ? nextMatch[1].trim() : 'See CLAUDE.md for details',
     updated: updatedMatch ? updatedMatch[1].trim() : null,
+    type,
+    series:    seriesMatch    ? seriesMatch[1].trim()    : null,
+    published: publishedMatch ? publishedMatch[1].trim() : null,
+    platform:  platformMatch  ? platformMatch[1].trim()  : null,
   };
 }
 
@@ -600,18 +678,28 @@ function renderCard(repo, data) {
     return;
   }
 
-  const { state, rawState, next, updated } = data;
-  el.className = 'card';
+  const { state, rawState, next, updated, type, series, published, platform } = data;
+  const isArticle = type === 'article';
+  const pubStatus = published
+    ? (published.toLowerCase() === 'yes' || published.toLowerCase() === 'true'
+        ? '<span style="color:#3fb950">● Published</span>'
+        : '<span style="color:#e3b341">○ Unpublished</span>')
+    : '';
+
+  el.className = 'card' + (isArticle ? ' card-article' : '');
   el.innerHTML = `
     <div class="card-accent ${accentClass(state)}"></div>
     <div class="card-header">
       <div>
         <div class="card-title">${repo}</div>
-        <div class="card-repo">${OWNER}/${repo}</div>
+        <div class="card-repo">${isArticle ? '📄 Article' : '⚙️ Repo'} · ${OWNER}/${repo}</div>
       </div>
       <span class="status-badge ${stateClass(state)}">${stateLabel(state, rawState)}</span>
     </div>
     <div class="card-body">
+      ${isArticle && series ? `<div class="next-action"><strong>Series</strong>${series}</div>` : ''}
+      ${isArticle && platform ? `<div class="next-action"><strong>Platform</strong>${platform}</div>` : ''}
+      ${isArticle ? `<div class="next-action"><strong>Published</strong>${pubStatus || '—'}</div>` : ''}
       <div class="next-action">
         <strong>Next Action</strong>
         ${next}
@@ -633,7 +721,9 @@ async function fetchCard(repo) {
     }
     const text = await res.text();
     const parsed = parseStatus(text);
+    cardData[repo] = parsed;
     renderCard(repo, parsed);
+    applyFilter();
     return parsed;
   } catch(e) {
     renderCard(repo, { error: 'Network error' });
