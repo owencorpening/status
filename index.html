@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owen's Applied Thinking — Operations</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --teal-deep:   #005f73;
+    --teal-mid:    #0a9396;
+    --teal-light:  #94d2bd;
+    --teal-pale:   #e9f5f3;
+    --ink:         #0d1117;
+    --ink-mid:     #24292e;
+    --ink-light:   #57606a;
+    --border:      #d0d7de;
+    --bg:          #f6f8fa;
+    --white:       #ffffff;
+    --red:         #cf222e;
+    --orange:      #bc4c00;
+    --yellow:      #9a6700;
+    --green:       #116329;
+    --green-bg:    #dafbe1;
+    --orange-bg:   #fff1e5;
+    --red-bg:      #ffebe9;
+    --yellow-bg:   #fff8c5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--ink);
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--ink) 0%, #0d2226 100%);
+    border-bottom: 1px solid var(--teal-deep);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-light);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .header-left h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.02em;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .last-updated {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-light);
+    opacity: 0.7;
+  }
+
+  .refresh-btn {
+    background: var(--teal-deep);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal-light);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .refresh-btn:hover {
+    background: var(--teal-mid);
+    color: var(--white);
+  }
+
+  /* TOKEN INPUT */
+  .token-bar {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .token-bar label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-light);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .token-bar input {
+    flex: 1;
+    max-width: 400px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  .token-bar input:focus { border-color: var(--teal-mid); }
+
+  .token-note {
+    font-size: 11px;
+    color: var(--ink-light);
+  }
+
+  /* SUMMARY BAR */
+  .summary-bar {
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 16px 32px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .summary-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .pill-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+
+  .pill-count {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .pill-label { color: var(--ink-light); font-size: 11px; }
+
+  /* MAIN GRID */
+  main {
+    padding: 24px 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+
+  /* PROJECT CARD */
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+  }
+
+  .card:hover {
+    border-color: var(--teal-mid);
+    transform: translateY(-2px);
+  }
+
+  .card-accent {
+    height: 3px;
+    width: 100%;
+  }
+
+  .card-header {
+    padding: 16px 16px 12px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+
+  .card-repo {
+    font-size: 10px;
+    color: var(--teal-light);
+    opacity: 0.6;
+    margin-top: 3px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .status-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    padding: 0 16px 16px;
+  }
+
+  .next-action {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    min-height: 40px;
+  }
+
+  .next-action strong {
+    color: var(--teal-light);
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .card-footer {
+    padding: 10px 16px;
+    background: #0d1117;
+    border-top: 1px solid #21262d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .updated-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #484f58;
+  }
+
+  .github-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--teal-light);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .github-link:hover { opacity: 1; }
+
+  /* STATUS COLORS */
+  .state-shipped    { background: #1a3a27; color: #3fb950; }
+  .state-progress   { background: #1a2840; color: #58a6ff; }
+  .state-blocked    { background: #3a1a1a; color: #ff7b72; }
+  .state-ready      { background: #2d2a1a; color: #e3b341; }
+  .state-queued     { background: #1e1e2e; color: #a5a5ff; }
+  .state-unknown    { background: #1e1e1e; color: #8b949e; }
+
+  .accent-shipped   { background: #3fb950; }
+  .accent-progress  { background: #58a6ff; }
+  .accent-blocked   { background: #ff7b72; }
+  .accent-ready     { background: #e3b341; }
+  .accent-queued    { background: #a5a5ff; }
+  .accent-unknown   { background: #484f58; }
+
+  /* LOADING / ERROR */
+  .loading-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #8b949e;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+  }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #30363d;
+    border-top-color: var(--teal-mid);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-msg {
+    color: #ff7b72;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 0;
+  }
+
+  /* MANUAL REPO INPUT */
+  .add-repo-bar {
+    padding: 0 32px 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .add-repo-bar input {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: var(--white);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 4px;
+    outline: none;
+    width: 280px;
+  }
+
+  .add-repo-bar input:focus { border-color: var(--teal-mid); }
+
+  .add-btn {
+    background: var(--teal-deep);
+    border: 1px solid var(--teal-mid);
+    color: var(--teal-light);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .add-btn:hover { background: var(--teal-mid); color: var(--white); }
+
+  .section-label {
+    padding: 0 32px 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--teal-light);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Owen's Applied Thinking</h1>
+    <h2>Operations Dashboard</h2>
+  </div>
+  <div class="header-right">
+    <span class="last-updated" id="lastUpdated">—</span>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</header>
+
+<div class="token-bar">
+  <label>GITHUB TOKEN</label>
+  <input type="password" id="ghToken" placeholder="ghp_... (optional, increases rate limit)" 
+         onchange="saveToken()" />
+  <span class="token-note">Stored locally. Never sent anywhere except api.github.com.</span>
+</div>
+
+<div class="summary-bar" id="summaryBar">
+  <div class="summary-pill">
+    <div class="pill-dot" style="background:#3fb950"></div>
+    <span class="pill-count" id="countShipped">—</span>
+    <span class="pill-label">Shipped</span>
+  </div>
+  <div class="summary-pill">
+    <div class="pill-dot" style="background:#58a6ff"></div>
+    <span class="pill-count" id="countProgress">—</span>
+    <span class="pill-label">In Progress</span>
+  </div>
+  <div class="summary-pill">
+    <div class="pill-dot" style="background:#e3b341"></div>
+    <span class="pill-count" id="countReady">—</span>
+    <span class="pill-label">Ready</span>
+  </div>
+  <div class="summary-pill">
+    <div class="pill-dot" style="background:#ff7b72"></div>
+    <span class="pill-count" id="countBlocked">—</span>
+    <span class="pill-label">Blocked</span>
+  </div>
+  <div class="summary-pill">
+    <div class="pill-dot" style="background:#a5a5ff"></div>
+    <span class="pill-count" id="countQueued">—</span>
+    <span class="pill-label">Queued</span>
+  </div>
+</div>
+
+<div class="section-label">Add Repo</div>
+<div class="add-repo-bar">
+  <input type="text" id="newRepo" placeholder="owencorpening/repo-name" 
+         onkeydown="if(event.key==='Enter') addRepo()" />
+  <button class="add-btn" onclick="addRepo()">+ Add</button>
+</div>
+
+<main id="grid"></main>
+
+<script>
+const OWNER = 'owencorpening';
+
+// Default repos — add/remove as needed
+const DEFAULT_REPOS = [
+  'ghost-tracker',
+  'wraith',
+  'cheatsheets-vscode',
+  'citation-capture',
+  'claude-drive-bridge',
+  'reaper-react-bridge',
+  'Reaper_InsertLyrics',
+  'image-capture',
+];
+
+let repos = [];
+let cards = {};
+
+function saveToken() {
+  const t = document.getElementById('ghToken').value.trim();
+  if (t) localStorage.setItem('gh_token', t);
+}
+
+function loadToken() {
+  const t = localStorage.getItem('gh_token');
+  if (t) document.getElementById('ghToken').value = t;
+  return t || null;
+}
+
+function saveRepos() {
+  localStorage.setItem('dashboard_repos', JSON.stringify(repos));
+}
+
+function loadRepos() {
+  const saved = localStorage.getItem('dashboard_repos');
+  repos = saved ? JSON.parse(saved) : [...DEFAULT_REPOS];
+}
+
+function addRepo() {
+  const input = document.getElementById('newRepo');
+  let val = input.value.trim();
+  if (!val) return;
+  // Accept "owner/repo" or just "repo"
+  if (!val.includes('/')) val = OWNER + '/' + val;
+  const repoName = val.split('/')[1];
+  if (!repos.includes(repoName)) {
+    repos.push(repoName);
+    saveRepos();
+    renderCard(repoName);
+    fetchCard(repoName);
+  }
+  input.value = '';
+}
+
+function getHeaders() {
+  const token = loadToken();
+  const h = { 'Accept': 'application/vnd.github.v3.raw' };
+  if (token) h['Authorization'] = `Bearer ${token}`;
+  return h;
+}
+
+function parseStatus(content) {
+  // Look for ## Status block
+  const statusMatch = content.match(/##\s+Status\s*\n([\s\S]*?)(?=\n##|\n---|\Z|$)/i);
+  if (!statusMatch) return { state: 'unknown', next: 'No status block found in CLAUDE.md', updated: null };
+
+  const block = statusMatch[1];
+
+  const stateMatch = block.match(/[-*]\s+\*\*State[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const nextMatch  = block.match(/[-*]\s+\*\*Next action[:\*]*\*?\*?\s*:?\s*(.+)/i);
+  const updatedMatch = block.match(/[-*]\s+\*\*Last updated[:\*]*\*?\*?\s*:?\s*(.+)/i);
+
+  const rawState = stateMatch ? stateMatch[1].trim() : 'unknown';
+  const state = normalizeState(rawState);
+
+  return {
+    state,
+    rawState,
+    next: nextMatch ? nextMatch[1].trim() : 'See CLAUDE.md for details',
+    updated: updatedMatch ? updatedMatch[1].trim() : null,
+  };
+}
+
+function normalizeState(s) {
+  const lower = s.toLowerCase();
+  if (lower.includes('ship')) return 'shipped';
+  if (lower.includes('progress') || lower.includes('active') || lower.includes('wip')) return 'progress';
+  if (lower.includes('block')) return 'blocked';
+  if (lower.includes('ready')) return 'ready';
+  if (lower.includes('queue') || lower.includes('planned') || lower.includes('backlog')) return 'queued';
+  return 'unknown';
+}
+
+function stateClass(state) {
+  return {
+    shipped: 'state-shipped',
+    progress: 'state-progress',
+    blocked: 'state-blocked',
+    ready: 'state-ready',
+    queued: 'state-queued',
+    unknown: 'state-unknown',
+  }[state] || 'state-unknown';
+}
+
+function accentClass(state) {
+  return {
+    shipped: 'accent-shipped',
+    progress: 'accent-progress',
+    blocked: 'accent-blocked',
+    ready: 'accent-ready',
+    queued: 'accent-queued',
+    unknown: 'accent-unknown',
+  }[state] || 'accent-unknown';
+}
+
+function stateLabel(state, raw) {
+  if (state === 'unknown' && raw && raw !== 'unknown') return raw;
+  return {
+    shipped: 'Shipped',
+    progress: 'In Progress',
+    blocked: 'Blocked',
+    ready: 'Ready to Ship',
+    queued: 'Queued',
+    unknown: 'No Status',
+  }[state] || state;
+}
+
+function renderCard(repo, data) {
+  const grid = document.getElementById('grid');
+  const id = 'card-' + repo.replace(/[^a-z0-9]/gi, '-');
+
+  if (!document.getElementById(id)) {
+    const el = document.createElement('div');
+    el.id = id;
+    grid.appendChild(el);
+  }
+
+  const el = document.getElementById(id);
+
+  if (!data) {
+    el.innerHTML = `
+      <div class="loading-card">
+        <div class="spinner"></div>
+        <span>Loading ${repo}…</span>
+      </div>`;
+    return;
+  }
+
+  if (data.error) {
+    const state = 'unknown';
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="card-accent ${accentClass(state)}"></div>
+      <div class="card-header">
+        <div>
+          <div class="card-title">${repo}</div>
+          <div class="card-repo">${OWNER}/${repo}</div>
+        </div>
+        <span class="status-badge ${stateClass(state)}">No CLAUDE.md</span>
+      </div>
+      <div class="card-body">
+        <div class="next-action">
+          <strong>Status</strong>
+          <span class="error-msg">${data.error}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="updated-tag">—</span>
+        <a class="github-link" href="https://github.com/${OWNER}/${repo}" target="_blank">→ GitHub</a>
+      </div>`;
+    return;
+  }
+
+  const { state, rawState, next, updated } = data;
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="card-accent ${accentClass(state)}"></div>
+    <div class="card-header">
+      <div>
+        <div class="card-title">${repo}</div>
+        <div class="card-repo">${OWNER}/${repo}</div>
+      </div>
+      <span class="status-badge ${stateClass(state)}">${stateLabel(state, rawState)}</span>
+    </div>
+    <div class="card-body">
+      <div class="next-action">
+        <strong>Next Action</strong>
+        ${next}
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="updated-tag">${updated ? 'Updated ' + updated : '—'}</span>
+      <a class="github-link" href="https://github.com/${OWNER}/${repo}/blob/main/CLAUDE.md" target="_blank">→ CLAUDE.md</a>
+    </div>`;
+}
+
+async function fetchCard(repo) {
+  const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/CLAUDE.md`;
+  try {
+    const res = await fetch(url, { headers: getHeaders() });
+    if (!res.ok) {
+      renderCard(repo, { error: res.status === 404 ? 'CLAUDE.md not found' : `HTTP ${res.status}` });
+      return null;
+    }
+    const text = await res.text();
+    const parsed = parseStatus(text);
+    renderCard(repo, parsed);
+    return parsed;
+  } catch(e) {
+    renderCard(repo, { error: 'Network error' });
+    return null;
+  }
+}
+
+function updateSummary(results) {
+  const counts = { shipped: 0, progress: 0, ready: 0, blocked: 0, queued: 0 };
+  results.forEach(r => { if (r && counts[r.state] !== undefined) counts[r.state]++; });
+  document.getElementById('countShipped').textContent = counts.shipped;
+  document.getElementById('countProgress').textContent = counts.progress;
+  document.getElementById('countReady').textContent = counts.ready;
+  document.getElementById('countBlocked').textContent = counts.blocked;
+  document.getElementById('countQueued').textContent = counts.queued;
+  document.getElementById('lastUpdated').textContent = 
+    'Last refreshed ' + new Date().toLocaleTimeString();
+}
+
+async function loadAll() {
+  document.getElementById('grid').innerHTML = '';
+  repos.forEach(r => renderCard(r));
+  const results = await Promise.all(repos.map(r => fetchCard(r)));
+  updateSummary(results.filter(Boolean));
+}
+
+// Init
+loadToken();
+loadRepos();
+loadAll();
+</script>
+</body>
+</html>
