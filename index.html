@@ -203,6 +203,14 @@ async function load() {
 
 const saved = localStorage.getItem(TOK_KEY);
 if (saved) document.getElementById('tok').value = saved;
+
+document.getElementById('tok').addEventListener('input', () => {
+  const t = document.getElementById('tok').value.trim();
+  if (t) localStorage.setItem(TOK_KEY, t);
+  clearTimeout(window._tokTimer);
+  window._tokTimer = setTimeout(load, 600);
+});
+
 load();
 </script>
 </body>
