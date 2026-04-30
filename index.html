@@ -144,7 +144,10 @@ function skel(n = 12) {
 async function fetchRepos(tok) {
   const h = { 'Accept': 'application/vnd.github.v3+json' };
   if (tok) h['Authorization'] = 'Bearer ' + tok;
-  const r = await fetch(`https://api.github.com/users/${OWNER}/repos?per_page=100&sort=pushed`, { headers: h });
+  const url = tok
+    ? `https://api.github.com/user/repos?per_page=100&sort=pushed&affiliation=owner`
+    : `https://api.github.com/users/${OWNER}/repos?per_page=100&sort=pushed`;
+  const r = await fetch(url, { headers: h });
   if (!r.ok) throw new Error('Could not list repos: ' + r.status);
   const repos = await r.json();
   return repos.map(r => r.name);
