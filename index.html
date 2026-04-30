@@ -99,19 +99,6 @@ footer{border-top:1px solid var(--border);padding:10px 20px;font-family:var(--mo
 
 <script>
 const OWNER = 'owencorpening';
-const REPOS = [
-  'ghost-tracker',
-  'wraith',
-  'cheatsheets-vscode',
-  'citation-capture',
-  'claude-drive-bridge',
-  'reaper-react-bridge',
-  'Reaper_InsertLyrics',
-  'image-capture',
-  'globe-with-time-knob',
-  'songster',
-  'status',
-];
 
 const TOK_KEY = 'owen_gh_tok';
 
@@ -150,8 +137,17 @@ function card({ repo, state, next, updated, error }) {
   </div>`;
 }
 
-function skel() {
-  return REPOS.map(() => `<div class="skel"><div class="skel-line" style="width:50%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:30%"></div></div>`).join('');
+function skel(n = 12) {
+  return Array(n).fill(`<div class="skel"><div class="skel-line" style="width:50%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:30%"></div></div>`).join('');
+}
+
+async function fetchRepos(tok) {
+  const h = { 'Accept': 'application/vnd.github.v3+json' };
+  if (tok) h['Authorization'] = 'Bearer ' + tok;
+  const r = await fetch(`https://api.github.com/users/${OWNER}/repos?per_page=100&sort=pushed`, { headers: h });
+  if (!r.ok) throw new Error('Could not list repos: ' + r.status);
+  const repos = await r.json();
+  return repos.map(r => r.name);
 }
 
 async function fetchOne(repo, tok) {
@@ -197,7 +193,14 @@ async function load() {
   if (tok) localStorage.setItem(TOK_KEY, tok);
   document.getElementById('main').innerHTML = `<div class="section"><div class="grid">${skel()}</div></div>`;
   document.getElementById('summary').textContent = 'loading…';
-  const results = await Promise.all(REPOS.map(r => fetchOne(r, tok)));
+  let repos;
+  try {
+    repos = await fetchRepos(tok);
+  } catch (e) {
+    document.getElementById('summary').textContent = e.message;
+    return;
+  }
+  const results = await Promise.all(repos.map(r => fetchOne(r, tok)));
   render(results);
 }
 
