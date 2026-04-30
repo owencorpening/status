@@ -208,7 +208,8 @@ async function load() {
     document.getElementById('summary').textContent = e.message;
     return;
   }
-  const results = await Promise.all(repos.map(r => fetchOne(r, tok)));
+  const all = await Promise.all(repos.map(r => fetchOne(r, tok)));
+  const results = all.filter(r => r.state && r.state.toLowerCase() !== 'static');
   render(results);
 }
 
