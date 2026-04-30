@@ -35,6 +35,9 @@
   --unknown: #1e1e1e;
   --unknown-text: #666;
   --unknown-border: #2a2a2a;
+  --static: #1a1a22;
+  --static-text: #888;
+  --static-border: #2a2a38;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;min-height:100vh}
@@ -65,6 +68,7 @@ main{padding:16px 20px}
 .b-ready{background:var(--ready);color:var(--ready-text);border:1px solid var(--ready-border)}
 .b-queued{background:var(--queued);color:var(--queued-text);border:1px solid var(--queued-border)}
 .b-unknown{background:var(--unknown);color:var(--unknown-text);border:1px solid var(--unknown-border)}
+.b-static{background:var(--static);color:var(--static-text);border:1px solid var(--static-border)}
 .next{font-size:11px;color:var(--text2);line-height:1.45;margin-top:2px}
 .updated{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:7px}
 .err{font-size:11px;color:var(--text3);font-style:italic;margin-top:3px}
@@ -110,6 +114,7 @@ function badgeClass(s) {
   if (l.includes('progress') || l.includes('wip')) return 'b-progress';
   if (l.includes('block')) return 'b-blocked';
   if (l.includes('queue')) return 'b-queued';
+  if (l.includes('static')) return 'b-static';
   return 'b-unknown';
 }
 
@@ -169,7 +174,7 @@ async function fetchOne(repo, tok) {
   }
 }
 
-const ORDER = ['Shipped', 'Ready to Ship', 'In Progress', 'Blocked', 'Queued', null];
+const ORDER = ['Shipped', 'Ready to Ship', 'In Progress', 'Blocked', 'Queued', 'Static', null];
 
 function render(results) {
   const g = {};
