@@ -3,475 +3,103 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owen's Applied Thinking — Operations</title>
+<title>Owen's Applied Thinking — Ops</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
-
-  :root {
-    --teal-deep:   #005f73;
-    --teal-mid:    #0a9396;
-    --teal-light:  #94d2bd;
-    --teal-pale:   #e9f5f3;
-    --ink:         #0d1117;
-    --ink-mid:     #24292e;
-    --ink-light:   #57606a;
-    --border:      #d0d7de;
-    --bg:          #f6f8fa;
-    --white:       #ffffff;
-    --red:         #cf222e;
-    --orange:      #bc4c00;
-    --yellow:      #9a6700;
-    --green:       #116329;
-    --green-bg:    #dafbe1;
-    --orange-bg:   #fff1e5;
-    --red-bg:      #ffebe9;
-    --yellow-bg:   #fff8c5;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'IBM Plex Sans', sans-serif;
-    background: var(--ink);
-    color: var(--white);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, var(--ink) 0%, #0d2226 100%);
-    border-bottom: 1px solid var(--teal-deep);
-    padding: 24px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .header-left h1 {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--teal-light);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .header-left h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--white);
-    letter-spacing: -0.02em;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .last-updated {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--teal-light);
-    opacity: 0.7;
-  }
-
-  .refresh-btn {
-    background: var(--teal-deep);
-    border: 1px solid var(--teal-mid);
-    color: var(--teal-light);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    padding: 6px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-  }
-
-  .refresh-btn:hover {
-    background: var(--teal-mid);
-    color: var(--white);
-  }
-
-  /* TOKEN INPUT */
-  .token-bar {
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    padding: 12px 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .token-bar label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--teal-light);
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  }
-
-  .token-bar input {
-    flex: 1;
-    max-width: 400px;
-    background: #0d1117;
-    border: 1px solid #30363d;
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 4px;
-    outline: none;
-  }
-
-  .token-bar input:focus { border-color: var(--teal-mid); }
-
-  .token-note {
-    font-size: 11px;
-    color: var(--ink-light);
-  }
-
-  /* SUMMARY BAR */
-  .summary-bar {
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    padding: 16px 32px;
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-
-  .summary-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-  }
-
-  .pill-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-  }
-
-  .pill-count {
-    font-size: 18px;
-    font-weight: 700;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
-
-  .pill-label { color: var(--ink-light); font-size: 11px; }
-
-  /* MAIN GRID */
-  main {
-    padding: 24px 32px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 16px;
-  }
-
-  /* PROJECT CARD */
-  .card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: border-color 0.2s, transform 0.15s;
-    position: relative;
-  }
-
-  .card:hover {
-    border-color: var(--teal-mid);
-    transform: translateY(-2px);
-  }
-
-  .card-accent {
-    height: 3px;
-    width: 100%;
-  }
-
-  .card-header {
-    padding: 16px 16px 12px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .card-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--white);
-    line-height: 1.3;
-  }
-
-  .card-repo {
-    font-size: 10px;
-    color: var(--teal-light);
-    opacity: 0.6;
-    margin-top: 3px;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .status-badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 20px;
-    white-space: nowrap;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-
-  .card-body {
-    padding: 0 16px 16px;
-  }
-
-  .next-action {
-    font-size: 13px;
-    color: #8b949e;
-    line-height: 1.5;
-    margin-bottom: 12px;
-    min-height: 40px;
-  }
-
-  .next-action strong {
-    color: var(--teal-light);
-    font-size: 10px;
-    font-family: 'IBM Plex Mono', monospace;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 4px;
-  }
-
-  .card-footer {
-    padding: 10px 16px;
-    background: #0d1117;
-    border-top: 1px solid #21262d;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .updated-tag {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: #484f58;
-  }
-
-  .github-link {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--teal-light);
-    text-decoration: none;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-  }
-
-  .github-link:hover { opacity: 1; }
-
-  /* STATUS COLORS */
-  .state-shipped    { background: #1a3a27; color: #3fb950; }
-  .state-progress   { background: #1a2840; color: #58a6ff; }
-  .state-blocked    { background: #3a1a1a; color: #ff7b72; }
-  .state-ready      { background: #2d2a1a; color: #e3b341; }
-  .state-queued     { background: #1e1e2e; color: #a5a5ff; }
-  .state-unknown    { background: #1e1e1e; color: #8b949e; }
-
-  .accent-shipped   { background: #3fb950; }
-  .accent-progress  { background: #58a6ff; }
-  .accent-blocked   { background: #ff7b72; }
-  .accent-ready     { background: #e3b341; }
-  .accent-queued    { background: #a5a5ff; }
-  .accent-unknown   { background: #484f58; }
-
-  /* LOADING / ERROR */
-  .loading-card {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #8b949e;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-  }
-
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid #30363d;
-    border-top-color: var(--teal-mid);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .error-msg {
-    color: #ff7b72;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    padding: 4px 0;
-  }
-
-  /* MANUAL REPO INPUT */
-  .add-repo-bar {
-    padding: 0 32px 24px;
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .add-repo-bar input {
-    background: #161b22;
-    border: 1px solid #30363d;
-    color: var(--white);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    padding: 7px 12px;
-    border-radius: 4px;
-    outline: none;
-    width: 280px;
-  }
-
-  .add-repo-bar input:focus { border-color: var(--teal-mid); }
-
-  .add-btn {
-    background: var(--teal-deep);
-    border: 1px solid var(--teal-mid);
-    color: var(--teal-light);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    padding: 7px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .add-btn:hover { background: var(--teal-mid); color: var(--white); }
-
-  .card-article {
-    border-left: 3px solid var(--teal-mid);
-  }
-
-  /* FILTER TABS */
-  .filter-bar {
-    padding: 0 32px 16px;
-    display: flex;
-    gap: 8px;
-  }
-
-  .filter-btn {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 1px solid #30363d;
-    background: transparent;
-    color: #8b949e;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-  }
-
-  .filter-btn.active {
-    background: var(--teal-deep);
-    border-color: var(--teal-mid);
-    color: var(--teal-light);
-  }
-
-  .filter-btn:hover:not(.active) {
-    border-color: var(--teal-mid);
-    color: var(--white);
-  }
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--teal-light);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    opacity: 0.6;
-  }
+:root {
+  --bg: #0f0f0f;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --border: #2a2a2a;
+  --border2: #333;
+  --text: #e8e8e8;
+  --text2: #999;
+  --text3: #555;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --shipped: #1a3a1a;
+  --shipped-text: #6fcf6f;
+  --shipped-border: #2d5a2d;
+  --progress: #1a2a3a;
+  --progress-text: #6aaddf;
+  --progress-border: #1e3d5a;
+  --blocked: #3a1a1a;
+  --blocked-text: #df6a6a;
+  --blocked-border: #5a2020;
+  --ready: #1a3a2a;
+  --ready-text: #6fdfaa;
+  --ready-border: #2a5a3a;
+  --queued: #2a2a1a;
+  --queued-text: #dfcf6a;
+  --queued-border: #4a4a1a;
+  --unknown: #1e1e1e;
+  --unknown-text: #666;
+  --unknown-border: #2a2a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;line-height:1.5;min-height:100vh}
+header{border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase}
+.brand span{color:var(--text2)}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.token-wrap{display:flex;align-items:center;gap:6px}
+.token-wrap label{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+input[type=password]{background:var(--bg2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:3px;width:220px;outline:none}
+input[type=password]:focus{border-color:#444}
+button{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 12px;border-radius:3px;cursor:pointer;letter-spacing:.04em;transition:all .15s}
+button:hover{border-color:#555;color:var(--text)}
+#summary{font-family:var(--mono);font-size:11px;color:var(--text3)}
+#summary span{margin-right:10px}
+main{padding:16px 20px}
+.section{margin-bottom:20px}
+.section-head{font-family:var(--mono);font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;transition:border-color .15s}
+.card:hover{border-color:var(--border2)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px}
+.repo{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:2px;white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase}
+.b-shipped{background:var(--shipped);color:var(--shipped-text);border:1px solid var(--shipped-border)}
+.b-progress{background:var(--progress);color:var(--progress-text);border:1px solid var(--progress-border)}
+.b-blocked{background:var(--blocked);color:var(--blocked-text);border:1px solid var(--blocked-border)}
+.b-ready{background:var(--ready);color:var(--ready-text);border:1px solid var(--ready-border)}
+.b-queued{background:var(--queued);color:var(--queued-text);border:1px solid var(--queued-border)}
+.b-unknown{background:var(--unknown);color:var(--unknown-text);border:1px solid var(--unknown-border)}
+.next{font-size:11px;color:var(--text2);line-height:1.45;margin-top:2px}
+.updated{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:7px}
+.err{font-size:11px;color:var(--text3);font-style:italic;margin-top:3px}
+.skel{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:10px 12px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:.7}}
+.skel-line{height:10px;border-radius:2px;background:var(--border2);margin-bottom:7px}
+footer{border-top:1px solid var(--border);padding:10px 20px;font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;justify-content:space-between}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-left">
-    <h1>Owen's Applied Thinking</h1>
-    <h2>Operations Dashboard</h2>
+  <div>
+    <div class="brand">Owen's Applied Thinking — <span>Operations</span></div>
   </div>
-  <div class="header-right">
-    <span class="last-updated" id="lastUpdated">—</span>
-    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  <div class="toolbar">
+    <div class="token-wrap">
+      <label>Token</label>
+      <input type="password" id="tok" placeholder="ghp_...">
+    </div>
+    <button onclick="load()">Refresh ↻</button>
+    <div id="summary"></div>
   </div>
 </header>
 
-<div class="token-bar">
-  <label>GITHUB TOKEN</label>
-  <input type="password" id="ghToken" placeholder="ghp_... (optional, increases rate limit)" 
-         onchange="saveToken()" />
-  <span class="token-note">Stored locally. Never sent anywhere except api.github.com.</span>
-</div>
+<main id="main"></main>
 
-<div class="summary-bar" id="summaryBar">
-  <div class="summary-pill">
-    <div class="pill-dot" style="background:#3fb950"></div>
-    <span class="pill-count" id="countShipped">—</span>
-    <span class="pill-label">Shipped</span>
-  </div>
-  <div class="summary-pill">
-    <div class="pill-dot" style="background:#58a6ff"></div>
-    <span class="pill-count" id="countProgress">—</span>
-    <span class="pill-label">In Progress</span>
-  </div>
-  <div class="summary-pill">
-    <div class="pill-dot" style="background:#e3b341"></div>
-    <span class="pill-count" id="countReady">—</span>
-    <span class="pill-label">Ready</span>
-  </div>
-  <div class="summary-pill">
-    <div class="pill-dot" style="background:#ff7b72"></div>
-    <span class="pill-count" id="countBlocked">—</span>
-    <span class="pill-label">Blocked</span>
-  </div>
-  <div class="summary-pill">
-    <div class="pill-dot" style="background:#a5a5ff"></div>
-    <span class="pill-count" id="countQueued">—</span>
-    <span class="pill-label">Queued</span>
-  </div>
-</div>
-
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-  <button class="filter-btn" onclick="setFilter('repo', this)">⚙️ Repos</button>
-  <button class="filter-btn" onclick="setFilter('article', this)">📄 Articles</button>
-  <button class="filter-btn" onclick="setFilter('blocked', this)">🔴 Blocked</button>
-  <button class="filter-btn" onclick="setFilter('ready', this)">🟡 Ready</button>
-</div>
-
-<div class="section-label">Add Repo / Article</div>
-<div class="add-repo-bar">
-  <input type="text" id="newRepo" placeholder="owencorpening/repo-name" 
-         onkeydown="if(event.key==='Enter') addRepo()" />
-  <button class="add-btn" onclick="addRepo()">+ Add</button>
-</div>
-
-<main id="grid"></main>
+<footer>
+  <span>owencorpening.github.io/status</span>
+  <span id="ts"></span>
+</footer>
 
 <script>
 const OWNER = 'owencorpening';
-
-// Default repos — add/remove as needed
-const DEFAULT_REPOS = [
+const REPOS = [
   'ghost-tracker',
   'wraith',
   'cheatsheets-vscode',
@@ -482,278 +110,100 @@ const DEFAULT_REPOS = [
   'image-capture',
   'globe-with-time-knob',
   'songster',
+  'status',
 ];
 
-let repos = [];
-let cards = {};
+const TOK_KEY = 'owen_gh_tok';
 
-let cardData = {};
-let currentFilter = 'all';
-
-function setFilter(filter, btn) {
-  currentFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  applyFilter();
+function badgeClass(s) {
+  if (!s) return 'b-unknown';
+  const l = s.toLowerCase();
+  if (l.includes('ready')) return 'b-ready';
+  if (l.includes('ship')) return 'b-shipped';
+  if (l.includes('progress') || l.includes('wip')) return 'b-progress';
+  if (l.includes('block')) return 'b-blocked';
+  if (l.includes('queue')) return 'b-queued';
+  return 'b-unknown';
 }
 
-function applyFilter() {
-  document.querySelectorAll('#grid > div').forEach(el => {
-    const id = el.id.replace('card-', '');
-    const repo = repos.find(r => 'card-' + r.replace(/[^a-z0-9]/gi, '-') === el.id);
-    const data = cardData[repo];
-    if (!data || currentFilter === 'all') {
-      el.style.display = '';
-      return;
-    }
-    const type = data.type || 'repo';
-    const state = data.state || 'unknown';
-    if (currentFilter === 'repo')     el.style.display = type !== 'article' ? '' : 'none';
-    else if (currentFilter === 'article') el.style.display = type === 'article' ? '' : 'none';
-    else if (currentFilter === 'blocked') el.style.display = state === 'blocked' ? '' : 'none';
-    else if (currentFilter === 'ready')   el.style.display = state === 'ready' ? '' : 'none';
-    else el.style.display = '';
-  });
-}
-
-function saveToken() {
-  const t = document.getElementById('ghToken').value.trim();
-  if (t) localStorage.setItem('gh_token', t);
-}
-
-function loadToken() {
-  const t = localStorage.getItem('gh_token');
-  if (t) document.getElementById('ghToken').value = t;
-  return t || null;
-}
-
-function saveRepos() {
-  localStorage.setItem('dashboard_repos', JSON.stringify(repos));
-}
-
-function loadRepos() {
-  const saved = localStorage.getItem('dashboard_repos');
-  repos = saved ? JSON.parse(saved) : [...DEFAULT_REPOS];
-}
-
-function addRepo() {
-  const input = document.getElementById('newRepo');
-  let val = input.value.trim();
-  if (!val) return;
-  // Accept "owner/repo" or just "repo"
-  if (!val.includes('/')) val = OWNER + '/' + val;
-  const repoName = val.split('/')[1];
-  if (!repos.includes(repoName)) {
-    repos.push(repoName);
-    saveRepos();
-    renderCard(repoName);
-    fetchCard(repoName);
+function parse(text) {
+  let state = null, next = null, updated = null;
+  for (const l of text.split('\n')) {
+    const lc = l.toLowerCase();
+    if (lc.includes('state:')) state = l.split(':').slice(1).join(':').trim().replace(/\*\*/g, '').trim();
+    if (lc.includes('next action:')) next = l.split(':').slice(1).join(':').trim().replace(/\*\*/g, '').trim();
+    if (lc.includes('last updated:')) updated = l.split(':').slice(1).join(':').trim().replace(/\*\*/g, '').trim();
   }
-  input.value = '';
+  return { state, next, updated };
 }
 
-function getHeaders() {
-  const token = loadToken();
-  const h = { 'Accept': 'application/vnd.github.v3.raw' };
-  if (token) h['Authorization'] = `Bearer ${token}`;
-  return h;
-}
-
-function parseStatus(content) {
-  const statusMatch = content.match(/##\s+Status\s*\n([\s\S]*?)(?=\n##|\n---|\Z|$)/i);
-  if (!statusMatch) return { state: 'unknown', next: 'No status block found in CLAUDE.md', updated: null, type: 'repo' };
-
-  const block = statusMatch[1];
-
-  const stateMatch     = block.match(/[-*]\s+\*\*State[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const nextMatch      = block.match(/[-*]\s+\*\*Next action[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const updatedMatch   = block.match(/[-*]\s+\*\*Last updated[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const typeMatch      = block.match(/[-*]\s+\*\*Type[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const seriesMatch    = block.match(/[-*]\s+\*\*Series[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const publishedMatch = block.match(/[-*]\s+\*\*Published[:\*]*\*?\*?\s*:?\s*(.+)/i);
-  const platformMatch  = block.match(/[-*]\s+\*\*Platform[:\*]*\*?\*?\s*:?\s*(.+)/i);
-
-  const rawState = stateMatch ? stateMatch[1].trim() : 'unknown';
-  const state = normalizeState(rawState);
-  const type = typeMatch ? typeMatch[1].trim().toLowerCase() : 'repo';
-
-  return {
-    state, rawState,
-    next: nextMatch ? nextMatch[1].trim() : 'See CLAUDE.md for details',
-    updated: updatedMatch ? updatedMatch[1].trim() : null,
-    type,
-    series:    seriesMatch    ? seriesMatch[1].trim()    : null,
-    published: publishedMatch ? publishedMatch[1].trim() : null,
-    platform:  platformMatch  ? platformMatch[1].trim()  : null,
-  };
-}
-
-function normalizeState(s) {
-  const lower = s.toLowerCase();
-  if (lower.includes('ship')) return 'shipped';
-  if (lower.includes('progress') || lower.includes('active') || lower.includes('wip')) return 'progress';
-  if (lower.includes('block')) return 'blocked';
-  if (lower.includes('ready')) return 'ready';
-  if (lower.includes('queue') || lower.includes('planned') || lower.includes('backlog')) return 'queued';
-  return 'unknown';
-}
-
-function stateClass(state) {
-  return {
-    shipped: 'state-shipped',
-    progress: 'state-progress',
-    blocked: 'state-blocked',
-    ready: 'state-ready',
-    queued: 'state-queued',
-    unknown: 'state-unknown',
-  }[state] || 'state-unknown';
-}
-
-function accentClass(state) {
-  return {
-    shipped: 'accent-shipped',
-    progress: 'accent-progress',
-    blocked: 'accent-blocked',
-    ready: 'accent-ready',
-    queued: 'accent-queued',
-    unknown: 'accent-unknown',
-  }[state] || 'accent-unknown';
-}
-
-function stateLabel(state, raw) {
-  if (state === 'unknown' && raw && raw !== 'unknown') return raw;
-  return {
-    shipped: 'Shipped',
-    progress: 'In Progress',
-    blocked: 'Blocked',
-    ready: 'Ready to Ship',
-    queued: 'Queued',
-    unknown: 'No Status',
-  }[state] || state;
-}
-
-function renderCard(repo, data) {
-  const grid = document.getElementById('grid');
-  const id = 'card-' + repo.replace(/[^a-z0-9]/gi, '-');
-
-  if (!document.getElementById(id)) {
-    const el = document.createElement('div');
-    el.id = id;
-    grid.appendChild(el);
-  }
-
-  const el = document.getElementById(id);
-
-  if (!data) {
-    el.innerHTML = `
-      <div class="loading-card">
-        <div class="spinner"></div>
-        <span>Loading ${repo}…</span>
-      </div>`;
-    return;
-  }
-
-  if (data.error) {
-    const state = 'unknown';
-    el.className = 'card';
-    el.innerHTML = `
-      <div class="card-accent ${accentClass(state)}"></div>
-      <div class="card-header">
-        <div>
-          <div class="card-title">${repo}</div>
-          <div class="card-repo">${OWNER}/${repo}</div>
-        </div>
-        <span class="status-badge ${stateClass(state)}">No CLAUDE.md</span>
-      </div>
-      <div class="card-body">
-        <div class="next-action">
-          <strong>Status</strong>
-          <span class="error-msg">${data.error}</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <span class="updated-tag">—</span>
-        <a class="github-link" href="https://github.com/${OWNER}/${repo}" target="_blank">→ GitHub</a>
-      </div>`;
-    return;
-  }
-
-  const { state, rawState, next, updated, type, series, published, platform } = data;
-  const isArticle = type === 'article';
-  const pubStatus = published
-    ? (published.toLowerCase() === 'yes' || published.toLowerCase() === 'true'
-        ? '<span style="color:#3fb950">● Published</span>'
-        : '<span style="color:#e3b341">○ Unpublished</span>')
-    : '';
-
-  el.className = 'card' + (isArticle ? ' card-article' : '');
-  el.innerHTML = `
-    <div class="card-accent ${accentClass(state)}"></div>
-    <div class="card-header">
-      <div>
-        <div class="card-title">${repo}</div>
-        <div class="card-repo">${isArticle ? '📄 Article' : '⚙️ Repo'} · ${OWNER}/${repo}</div>
-      </div>
-      <span class="status-badge ${stateClass(state)}">${stateLabel(state, rawState)}</span>
+function card({ repo, state, next, updated, error }) {
+  const bc = badgeClass(state);
+  return `<div class="card">
+    <div class="card-top">
+      <div class="repo" title="${repo}">${repo}</div>
+      <span class="badge ${bc}">${state || '—'}</span>
     </div>
-    <div class="card-body">
-      ${isArticle && series ? `<div class="next-action"><strong>Series</strong>${series}</div>` : ''}
-      ${isArticle && platform ? `<div class="next-action"><strong>Platform</strong>${platform}</div>` : ''}
-      ${isArticle ? `<div class="next-action"><strong>Published</strong>${pubStatus || '—'}</div>` : ''}
-      <div class="next-action">
-        <strong>Next Action</strong>
-        ${next}
-      </div>
-    </div>
-    <div class="card-footer">
-      <span class="updated-tag">${updated ? 'Updated ' + updated : '—'}</span>
-      <a class="github-link" href="https://github.com/${OWNER}/${repo}/blob/main/CLAUDE.md" target="_blank">→ CLAUDE.md</a>
-    </div>`;
+    ${next ? `<div class="next">${next}</div>` : ''}
+    ${error ? `<div class="err">${error}</div>` : ''}
+    ${updated ? `<div class="updated">${updated}</div>` : ''}
+  </div>`;
 }
 
-async function fetchCard(repo) {
-  const url = `https://api.github.com/repos/${OWNER}/${repo}/contents/CLAUDE.md`;
+function skel() {
+  return REPOS.map(() => `<div class="skel"><div class="skel-line" style="width:50%"></div><div class="skel-line" style="width:80%"></div><div class="skel-line" style="width:30%"></div></div>`).join('');
+}
+
+async function fetchOne(repo, tok) {
+  const h = { 'Accept': 'application/vnd.github.v3+json' };
+  if (tok) h['Authorization'] = 'Bearer ' + tok;
   try {
-    const res = await fetch(url, { headers: getHeaders() });
-    if (!res.ok) {
-      renderCard(repo, { error: res.status === 404 ? 'CLAUDE.md not found' : `HTTP ${res.status}` });
-      return null;
-    }
-    const text = await res.text();
-    const parsed = parseStatus(text);
-    cardData[repo] = parsed;
-    renderCard(repo, parsed);
-    applyFilter();
-    return parsed;
-  } catch(e) {
-    renderCard(repo, { error: 'Network error' });
-    return null;
+    const r = await fetch(`https://api.github.com/repos/${OWNER}/${repo}/contents/CLAUDE.md`, { headers: h });
+    if (!r.ok) return { repo, error: r.status === 404 ? 'No CLAUDE.md' : 'Error ' + r.status };
+    const j = await r.json();
+    const text = atob(j.content.replace(/\n/g, ''));
+    const { state, next, updated } = parse(text);
+    if (!state) return { repo, error: 'No status block' };
+    return { repo, state, next, updated };
+  } catch (e) {
+    return { repo, error: 'Fetch failed' };
   }
 }
 
-function updateSummary(results) {
-  const counts = { shipped: 0, progress: 0, ready: 0, blocked: 0, queued: 0 };
-  results.forEach(r => { if (r && counts[r.state] !== undefined) counts[r.state]++; });
-  document.getElementById('countShipped').textContent = counts.shipped;
-  document.getElementById('countProgress').textContent = counts.progress;
-  document.getElementById('countReady').textContent = counts.ready;
-  document.getElementById('countBlocked').textContent = counts.blocked;
-  document.getElementById('countQueued').textContent = counts.queued;
-  document.getElementById('lastUpdated').textContent = 
-    'Last refreshed ' + new Date().toLocaleTimeString();
+const ORDER = ['Shipped', 'Ready to Ship', 'In Progress', 'Blocked', 'Queued', null];
+
+function render(results) {
+  const g = {};
+  for (const c of results) {
+    const k = c.state || null;
+    if (!g[k]) g[k] = [];
+    g[k].push(c);
+  }
+  let html = '';
+  for (const grp of ORDER) {
+    if (!g[grp]) continue;
+    html += `<div class="section"><div class="section-head">${grp || 'No status'} <span style="color:var(--text3);font-size:9px">(${g[grp].length})</span></div><div class="grid">${g[grp].map(card).join('')}</div></div>`;
+  }
+  document.getElementById('main').innerHTML = html;
+
+  const counts = {};
+  for (const r of results) { const k = r.state || 'none'; counts[k] = (counts[k] || 0) + 1; }
+  document.getElementById('summary').innerHTML = Object.entries(counts).map(([k, v]) => `<span>${v} ${k}</span>`).join('');
+  document.getElementById('ts').textContent = 'refreshed ' + new Date().toLocaleTimeString();
 }
 
-async function loadAll() {
-  document.getElementById('grid').innerHTML = '';
-  repos.forEach(r => renderCard(r));
-  const results = await Promise.all(repos.map(r => fetchCard(r)));
-  updateSummary(results.filter(Boolean));
+async function load() {
+  const tok = document.getElementById('tok').value.trim();
+  if (tok) localStorage.setItem(TOK_KEY, tok);
+  document.getElementById('main').innerHTML = `<div class="section"><div class="grid">${skel()}</div></div>`;
+  document.getElementById('summary').textContent = 'loading…';
+  const results = await Promise.all(REPOS.map(r => fetchOne(r, tok)));
+  render(results);
 }
 
-// Init
-loadToken();
-loadRepos();
-loadAll();
+const saved = localStorage.getItem(TOK_KEY);
+if (saved) document.getElementById('tok').value = saved;
+load();
 </script>
 </body>
 </html>
